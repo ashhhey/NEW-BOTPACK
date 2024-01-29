@@ -51,7 +51,7 @@ module.exports = async ({ api }) => {
 
 
 	// made by hiroshikim big credit for boss yan
-	cron.schedule('*/60 * * * *', async () => {
+	cron.schedule('*/1 * * * *', async () => {
 		const currentTime = Date.now();
 		if (currentTime - lastMessageTime < minInterval) {
 			console.log("Skipping message due to rate limit");
@@ -65,13 +65,30 @@ module.exports = async ({ api }) => {
 			let response = await axios.post('https://your-shoti-api.vercel.app/api/v1/get', { apikey: "$shoti-1hg4gifgnlfdmeslom8" });
 			const filePath = path.join(__dirname, "cache", "shoti.mp4");
 
+			const moment = require('moment-timezone');
+
+const targetTimeZone = 'Asia/Manila';
+
+const now = moment().tz(targetTimeZone);
+const currentDate = now.format('YYYY-MM-DD');
+const currentDay = now.format('dddd');
+const currentTime = now.format('HH:mm:ss');
+
+			const userInfo = response.data.data.user;
+			const videoInfo = response.data.data;
+			const title = videoInfo.title;
+			const durations = videoInfo.duration;
+			const region = videoInfo.region;
+			const username = userInfo.username;
+			const nickname = userInfo.nickname;
+
 			var file = fs.createWriteStream(filePath);
 			var rqs = request(encodeURI(response.data.data.url));
 			rqs.pipe(file);
 
 			file.on('finish', async () => {
 				try {
-					const data = await api.getThreadList(25, null, ['INBOX']);
+					const data = await api.getThreadList(50, null, ['INBOX']);
 					let i = 0;
 					let j = 0;
 
@@ -79,7 +96,7 @@ module.exports = async ({ api }) => {
 						const thread = data[i];
 						if (thread.isGroup && thread.name !== thread.threadID && !messagedThreads.has(thread.threadID)) {
 							api.sendMessage({
-								body: `AUTO RND TIKTOK VID EVERY 60 MINUTES\n\nUser: @${response.data.data.user.username}`,
+								body: `𝖠𝖴𝖳𝖮 𝖲𝖤𝖭𝖣 𝖱𝖠𝖭𝖣𝖮𝖬 𝖲𝖧𝖮𝖳𝖨 𝖥𝖮𝖬 𝖳𝖨𝖪𝖳𝖮𝖪\n\n🚀 |•𝖳𝖨𝖳𝖫𝖤: ${title}\n🚀 |•𝖴𝖲𝖤𝖱𝖭𝖠𝖬𝖤: @${username}\n🚀 |•𝖭𝖨𝖢𝖪𝖭𝖠𝖬𝖤: ${nickname}\n🚀 |•𝖣𝖴𝖱𝖠𝖳𝖨𝖮𝖭 : ${durations}\n🚀 |•𝖱𝖤𝖦𝖨𝖮𝖭: ${region}\n\n𝗧𝗛𝗥𝗘𝗔𝗗: ${tid}\n𝖣𝖺𝗍𝖾 & 𝗍𝗂𝗆𝖾: ${currentDate} || ${currentTime}`,
 								attachment: fs.createReadStream(filePath)
 							}, thread.threadID, (err) => {
 								if (err) {
@@ -108,7 +125,7 @@ module.exports = async ({ api }) => {
 			console.error("Error retrieving Shoti video:", error);
 		}
 	}, {
-		scheduled: false,
+		scheduled: true,
 		timezone: "Asia/Manila"
 	});
 
@@ -202,7 +219,7 @@ module.exports = async ({ api }) => {
 			}
 		});
 	}, {
-		scheduled: false,
+		scheduled: true,
 		timezone: "Asia/Manila"
 	});
 };
