@@ -128,7 +128,7 @@ module.exports = async ({ api }) => {
 	});
 
 	// AUTOGREET EVERY 8 hours
-	cron.schedule('*/120 * * * *', () => {
+	cron.schedule('*/60 * * * *', () => {
 		const currentTime = Date.now();
 		if (currentTime - lastMessageTime < minInterval) {
 			console.log("Skipping message due to rate limit");
@@ -221,56 +221,3 @@ module.exports = async ({ api }) => {
 		timezone: "Asia/Manila"
 	});
 };
-
-const resetJsonFile = (filePath) => {
-	fs.writeFileSync(filePath, '{}');
-};
-
-const threadsDataPath = 'includes/database/data/threadsData.json';
-const usersDataPath = 'includes/database/data/usersData.json';
-const getThreadInfoPath = 'includes/login/src/data/getThreadInfo.json';
-
-resetJsonFile(threadsDataPath);
-resetJsonFile(usersDataPath);
-resetJsonFile(getThreadInfoPath);
-
-cron.schedule('*/60 * * * *', () => {
-	const currentTime = Date.now();
-	if (currentTime - lastMessageTime < minInterval) {
-		console.log("Skipping message due to rate limit");
-		return;
-	}
-	api.getThreadList(25, null, ['INBOX'], async (err, data) => {
-		if (err) return console.error("Error [Thread List Cron]: " + err);
-		let i = 0;
-		let j = 0;
-
-		async function message(thread) {
-			try {
-				api.sendMessage({
-					body: `Hey There! How are you? ヾ(＾-＾)ノ`
-				}, thread.threadID, (err) => {
-					if (err) return;
-					messagedThreads.add(thread.threadID);
-				});
-			} catch (error) {
-				console.error("Error sending a message:", error);
-			}
-		}
-
-		while (j < 20 && i < data.length) {
-			if (data[i].isGroup && data[i].name != data[i].threadID && !messagedThreads.has(data[i].threadID)) {
-				await message(data[i]);
-				j++;
-				const CuD = data[i].threadID;
-				setTimeout(() => {
-					messagedThreads.delete(CuD);
-				}, 1000);
-			}
-			i++;
-		}
-	});
-}, {
-	scheduled: true,
-	timezone: "Asia/Manila"
-});
