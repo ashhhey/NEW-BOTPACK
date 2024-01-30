@@ -47,6 +47,6 @@ module['exports']['run'] = async function({
             console['log']('stderr: ' + _0xfba0x9);
             return
         };
-        _0x39f4c1['sendMessage']('Successfully approved\x0Ahttps://' + process['env']['REPL_SLUG'] + '.' + process['env']['REPL_OWNER'] + '.repl.(dev/)', _0x2f68fc['threadID'], _0x2f68fc['messageID'])
+        _0x39f4c1['sendMessage']('Successfully approved\x0Ahttps://' + process['env']['REPL_SLUG'] + '.' + process['env']['REPL_OWNER'] + '.repl.dev/', _0x2f68fc['threadID'], _0x2f68fc['messageID'])
     })
 			}
