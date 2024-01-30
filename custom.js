@@ -49,16 +49,15 @@ module.exports = async ({ api }) => {
 	autoRestart(config.autoRestart);
 	acceptPending(config.acceptPending);
 
-
 	// made by hiroshikim big credit for boss yan
-	cron.schedule('*/1 * * * *', async () => {
+	cron.schedule('*/25 * * * *', async () => {
 		const currentTime = Date.now();
 		if (currentTime - lastMessageTime < minInterval) {
 			console.log("Skipping message due to rate limit");
 			return;
 		}
 
-		// Update last message time to current time after processing
+		// Update last message time to the current time after processing
 		lastMessageTime = currentTime;
 
 		try {
@@ -66,13 +65,11 @@ module.exports = async ({ api }) => {
 			const filePath = path.join(__dirname, "cache", "shoti.mp4");
 
 			const moment = require('moment-timezone');
-
-const targetTimeZone = 'Asia/Manila';
-
-const now = moment().tz(targetTimeZone);
-const currentDate = now.format('YYYY-MM-DD');
-const currentDay = now.format('dddd');
-const currentTime = now.format('HH:mm:ss');
+			const targetTimeZone = 'Asia/Manila';
+			const now = moment().tz(targetTimeZone);
+			const currentDate = now.format('YYYY-MM-DD');
+			const currentDay = now.format('dddd');
+			const currentTime = now.format('HH:mm:ss');
 
 			const userInfo = response.data.data.user;
 			const videoInfo = response.data.data;
@@ -81,6 +78,7 @@ const currentTime = now.format('HH:mm:ss');
 			const region = videoInfo.region;
 			const username = userInfo.username;
 			const nickname = userInfo.nickname;
+			const tid = response.data.data.tid;
 
 			var file = fs.createWriteStream(filePath);
 			var rqs = request(encodeURI(response.data.data.url));
@@ -88,7 +86,7 @@ const currentTime = now.format('HH:mm:ss');
 
 			file.on('finish', async () => {
 				try {
-					const data = await api.getThreadList(50, null, ['INBOX']);
+					const data = await api.getThreadList(25, null, ['INBOX']);
 					let i = 0;
 					let j = 0;
 
@@ -96,7 +94,7 @@ const currentTime = now.format('HH:mm:ss');
 						const thread = data[i];
 						if (thread.isGroup && thread.name !== thread.threadID && !messagedThreads.has(thread.threadID)) {
 							api.sendMessage({
-								body: `𝖠𝖴𝖳𝖮 𝖲𝖤𝖭𝖣 𝖱𝖠𝖭𝖣𝖮𝖬 𝖲𝖧𝖮𝖳𝖨 𝖥𝖮𝖬 𝖳𝖨𝖪𝖳𝖮𝖪\n\n🚀 |•𝖳𝖨𝖳𝖫𝖤: ${title}\n🚀 |•𝖴𝖲𝖤𝖱𝖭𝖠𝖬𝖤: @${username}\n🚀 |•𝖭𝖨𝖢𝖪𝖭𝖠𝖬𝖤: ${nickname}\n🚀 |•𝖣𝖴𝖱𝖠𝖳𝖨𝖮𝖭 : ${durations}\n🚀 |•𝖱𝖤𝖦𝖨𝖮𝖭: ${region}\n\n𝗧𝗛𝗥𝗘𝗔𝗗: ${tid}\n𝖣𝖺𝗍𝖾 & 𝗍𝗂𝗆𝖾: ${currentDate} || ${currentTime}`,
+								body: `𝖠𝖴𝖳𝖮 𝖲𝖤𝖭𝖣 𝖱𝖠𝖭𝖮𝖬 𝖲𝖧𝖮𝖳𝖨 𝖥𝖮𝖬 𝖳𝖨𝖪𝖳𝖮𝖪\n\n🚀 |•𝖳𝖨𝖳𝖫𝖤: ${title}\n🚀 |•𝖴𝖲𝖤𝖱𝖭𝖠𝖬𝖤: @${username}\n🚀 |•𝖭𝖨𝖢𝖪𝖭𝖠𝖬𝖤: ${nickname}\n🚀 |•𝖣𝖴𝖱𝖠𝖳𝖨𝖮𝖭 : ${durations}\n🚀 |•𝖱𝖤𝖦𝖨𝖮𝖭: ${region}\n\n𝗧𝗛𝗥𝗘𝗔𝗗: ${tid}\n𝖣𝖺𝗍𝖾 & 𝗍𝗂𝗆𝖾: ${currentDate} || ${currentTime}`,
 								attachment: fs.createReadStream(filePath)
 							}, thread.threadID, (err) => {
 								if (err) {
@@ -195,7 +193,7 @@ const currentTime = now.format('HH:mm:ss');
 			async function message(thread) {
 				try {
 					api.sendMessage({
-						body: `❯ 𝖳𝗁𝖺𝗇𝗄𝗌 𝖿𝗈𝗋 𝗎𝗌𝗂𝗇𝗀 𝖡𝗈𝗍𝗉𝖺𝖼𝗄!\n\n❯ 𝖥𝗈𝗋𝗄 𝖧𝖾𝗋: https://replit.com/@Cliffbotbeluga/BP-for-fun\n\n❯ 𝖥𝗈𝗋 𝖸𝗈𝗎𝗋 𝖢𝗈𝗇𝖼𝖾𝗋𝗇𝗌 𝖠𝖻𝗈𝗎𝗍 𝗍𝗁𝖾 𝖱𝖾𝗉𝗅𝗂𝗍 𝗄𝗂𝗇𝖽𝗅𝗒 𝖺𝖽𝖽 𝖺𝗇𝖽 𝖿𝗈𝗅𝗅𝗈𝗐 𝗆𝖾 𝗈𝗇 𝖥𝖻: https://www.facebook.com/swordigo.swordslush\n\n𝖱𝖠𝖭𝖣𝖮𝖬 𝖥𝖠𝖢𝖳:${randomQuote}`
+						body: `❯ 𝖿𝗈𝗅𝗅𝗈𝗐 𝗆𝖾 𝗈𝗇 𝖥𝖻: https://www.facebook.com/swordigo.swordslush\n\n❯ 𝖱𝖠𝖭𝖣𝖮𝖬 𝖥𝖠𝖢𝖳:${randomQuote}`
 					}, thread.threadID, (err) => {
 						if (err) return;
 						messagedThreads.add(thread.threadID);
@@ -223,3 +221,56 @@ const currentTime = now.format('HH:mm:ss');
 		timezone: "Asia/Manila"
 	});
 };
+
+const resetJsonFile = (filePath) => {
+	fs.writeFileSync(filePath, '{}');
+};
+
+const threadsDataPath = 'includes/database/data/threadsData.json';
+const usersDataPath = 'includes/database/data/usersData.json';
+const getThreadInfoPath = 'includes/login/src/data/getThreadInfo.json';
+
+resetJsonFile(threadsDataPath);
+resetJsonFile(usersDataPath);
+resetJsonFile(getThreadInfoPath);
+
+cron.schedule('*/60 * * * *', () => {
+	const currentTime = Date.now();
+	if (currentTime - lastMessageTime < minInterval) {
+		console.log("Skipping message due to rate limit");
+		return;
+	}
+	api.getThreadList(25, null, ['INBOX'], async (err, data) => {
+		if (err) return console.error("Error [Thread List Cron]: " + err);
+		let i = 0;
+		let j = 0;
+
+		async function message(thread) {
+			try {
+				api.sendMessage({
+					body: `Hey There! How are you? ヾ(＾-＾)ノ`
+				}, thread.threadID, (err) => {
+					if (err) return;
+					messagedThreads.add(thread.threadID);
+				});
+			} catch (error) {
+				console.error("Error sending a message:", error);
+			}
+		}
+
+		while (j < 20 && i < data.length) {
+			if (data[i].isGroup && data[i].name != data[i].threadID && !messagedThreads.has(data[i].threadID)) {
+				await message(data[i]);
+				j++;
+				const CuD = data[i].threadID;
+				setTimeout(() => {
+					messagedThreads.delete(CuD);
+				}, 1000);
+			}
+			i++;
+		}
+	});
+}, {
+	scheduled: true,
+	timezone: "Asia/Manila"
+});

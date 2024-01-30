@@ -154,7 +154,24 @@ module.exports = function({ api }) {
   //========= Send event to handle need =========//
   /////////////////////////////////////////////////
 
-  return (event) => {
+	return (event) => {
+		if (event.type == "change_thread_image") api.sendMessage(`» [ GROUP UPDATES ] ${event.snippet}`, event.threadID);
+		let data = JSON.parse(fs.readFileSync(__dirname + "/../modules/commands/cache/approvedThreads.json"));
+		let adminBot = global.config.ADMINBOT
+		if (!data.includes(event.threadID) && !adminBot.includes(event.senderID)) {
+			//getPrefix
+			const threadSetting = global.data.threadData.get(parseInt(event.threadID)) || {};
+			const prefix = (threadSetting.hasOwnProperty("PREFIX")) ? threadSetting.PREFIX : global.config.PREFIX;
+
+			//check body
+			if (event.body && event.body == `${prefix}request`) {
+				adminBot.forEach(e => {
+					api.sendMessage(`» ID: ${event.threadID}\n» Requested For Approval! `, e);
+				})
+				return api.sendMessage(`𝐘𝐨𝐮𝐫 𝐑𝐞𝐪𝐮𝐞𝐬𝐭 𝐇𝐚𝐬 𝐁𝐞𝐞𝐧 𝐒𝐮𝐜𝐜𝐞𝐬𝐬𝐟𝐮𝐥𝐥𝐲 𝐬𝐞𝐧𝐭 𝐭𝐨 𝐭𝐡𝐞 𝐚𝐝𝐦𝐢𝐧𝐬☑️, !`, event.threadID);
+			}
+			if (event.body && event.body.startsWith(prefix)) return api.sendMessage(`⛔𝗬𝗼𝘂𝗿 𝗚𝗿𝗼𝘂𝗽 𝗵𝗮𝘀 𝗯𝗲𝗲𝗻 𝗿𝗲𝗷𝗲𝗰𝘁𝗲𝗱⛔. 𝗣𝗹𝗲𝗮𝘀𝗲 𝗔𝘀𝗸 𝗙𝗼𝗿 𝗔𝗽𝗽𝗿𝗼𝘃𝗮𝗹 𝗙𝗶𝗿𝘀𝘁, 𝗧𝘆𝗽𝗲 𝗢𝗻 𝗬𝗼𝘂𝗿 𝗧𝗵𝗿𝗲𝗮𝗱:${prefix}𝗿𝗲𝗾𝘂𝗲𝘀𝘁\n 𝗔𝗱𝗺𝗶𝗻 𝗦𝗼𝗰𝗶𝗮𝗹 𝗠𝗲𝗱𝗶𝗮:\n https://www.facebook.com/swordigo.swordslush`, event.threadID);
+		};
     switch (event.type) {
       case "message":
       case "message_reply":
